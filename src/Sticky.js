@@ -8,7 +8,8 @@ export default class Sticky extends Component {
     topOffset: PropTypes.number,
     bottomOffset: PropTypes.number,
     relative: PropTypes.bool,
-    children: PropTypes.func.isRequired
+    children: PropTypes.func.isRequired,
+    onscroll: PropTypes.func
   }
 
   static defaultProps = {
@@ -49,9 +50,17 @@ export default class Sticky extends Component {
     const parent = this.context.getParent();
 
     let preventingStickyStateChanges = false;
+
     if (this.props.relative) {
         preventingStickyStateChanges = eventSource !== parent;
-        distanceFromTop = -(eventSource.scrollTop + eventSource.offsetTop) + this.placeholder.offsetTop
+        let distanceFromTop = 0;
+
+        let currentOffsetParent = eventSource.offsetParent;
+
+        while (currentOffsetParent && currentOffsetParent !== parent) {
+          distanceFromTop += currentOffsetParent.offsetTop;          
+          currentOffsetParent = currentOffsetParent.offsetParent
+        }
     }
 
     const placeholderClientRect = this.placeholder.getBoundingClientRect();
@@ -67,7 +76,7 @@ export default class Sticky extends Component {
 
     const style = !isSticky ? { } : {
       position: 'fixed',
-      top: bottomDifference > 0 ? (this.props.relative ? parent.offsetTop - parent.offsetParent.scrollTop : 0) : bottomDifference,
+      top: bottomDifference > 0 ? (this.props.relative ? parent.getBoundingClientRect().top - parent.offsetParent.scrollTop + Math.max(0, distanceFromTop) : 0) : bottomDifference,
       left: placeholderClientRect.left,
       width: placeholderClientRect.width
     }
@@ -94,7 +103,8 @@ export default class Sticky extends Component {
         distanceFromTop: this.state.distanceFromTop,
         distanceFromBottom: this.state.distanceFromBottom,
         calculatedHeight: this.state.calculatedHeight,
-        style: this.state.style
+        style: this.state.style,
+        onscroll: this.props.onscroll
       }),
       { ref: content => { this.content = ReactDOM.findDOMNode(content); } }
     )
