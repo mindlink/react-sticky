@@ -9,7 +9,7 @@ export default class Sticky extends Component {
     bottomOffset: PropTypes.number,
     relative: PropTypes.bool,
     children: PropTypes.func.isRequired,
-    onscroll: PropTypes.func
+    onScroll: PropTypes.func
   }
 
   static defaultProps = {
@@ -104,14 +104,13 @@ export default class Sticky extends Component {
         distanceFromBottom: this.state.distanceFromBottom,
         calculatedHeight: this.state.calculatedHeight,
         style: this.state.style,
-        onscroll: this.props.onscroll
       }),
       { ref: content => { this.content = ReactDOM.findDOMNode(content); } }
     )
 
     return (
       <div>
-        <div ref={ placeholder => this.placeholder = placeholder } />
+        <div ref={ placeholder => this.placeholder = placeholder } onScroll={this.props.onScroll}/>
         { element }
       </div>
     )
