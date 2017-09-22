@@ -55,12 +55,14 @@ export default class Sticky extends Component {
         preventingStickyStateChanges = eventSource !== parent;
         let distanceFromTop = 0;
 
-        let currentOffsetParent = eventSource.offsetParent;
+        let currentOffsetParent = this.placeholder;
 
         while (currentOffsetParent && currentOffsetParent !== parent) {
           distanceFromTop += currentOffsetParent.offsetTop;          
           currentOffsetParent = currentOffsetParent.offsetParent
         }
+
+        distanceFromTop = distanceFromTop - parent.scrollTop;
     }
 
     const placeholderClientRect = this.placeholder.getBoundingClientRect();
