@@ -42,6 +42,11 @@ export default class Container extends PureComponent {
     this.doNotifySubscribers(evt.currentTarget);
   }
 
+  onScroll = evt => {
+    this.props.onScroll(evt);
+    this.notifySubscribers(evt);
+  }
+
   getParent = () => this.node
 
   componentDidMount() {
@@ -64,7 +69,7 @@ export default class Container extends PureComponent {
       <div
         { ...this.props }
         ref={ node => this.node = node }
-        onScroll={this.notifySubscribers}
+        onScroll={this.onScroll}
         onTouchStart={this.notifySubscribers}
         onTouchMove={this.notifySubscribers}
         onTouchEnd={this.notifySubscribers}
