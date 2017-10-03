@@ -39,21 +39,12 @@ export default class Container extends PureComponent {
   }
 
   notifySubscribers = evt => {
-    if (!this.framePending) {
-      const { currentTarget } = evt;
+    this.doNotifySubscribers(evt.currentTarget);
+  }
 
-      raf(() => {
-        this.framePending = false;
-        const { top, bottom } = this.node.getBoundingClientRect();
-
-        this.subscribers.forEach(handler => handler({
-          distanceFromTop: top,
-          distanceFromBottom: bottom,
-          eventSource: currentTarget === window ? document.body : this.node
-        }));
-      });
-      this.framePending = true;
-    }
+  onScroll = evt => {
+    this.props.onScroll(evt);
+    this.notifySubscribers(evt);
   }
 
   getParent = () => this.node
@@ -66,16 +57,45 @@ export default class Container extends PureComponent {
     this.events.forEach(event => window.removeEventListener(event, this.notifySubscribers))
   }
 
+  /**
+   * Notifies the current node of a layout update.
+   */
+  notifyLayoutUpdate() {
+    this.doNotifySubscribers(this.node);
+  }
+
   render() {
     return (
       <div
         { ...this.props }
         ref={ node => this.node = node }
-        onScroll={this.notifySubscribers}
+        onScroll={this.onScroll}
         onTouchStart={this.notifySubscribers}
         onTouchMove={this.notifySubscribers}
         onTouchEnd={this.notifySubscribers}
       />
     );
+  }
+
+  /**
+   * Notifies the subscribers of this container.
+   * 
+   * @param {HTMLElement} updateSource The source of the update.
+   */
+  doNotifySubscribers(updateSource) {
+    if (!this.framePending) {
+      
+      raf(() => {
+        this.framePending = false;
+        const { top, bottom } = this.node.getBoundingClientRect();
+
+        this.subscribers.forEach(handler => handler({
+          distanceFromTop: top,
+          distanceFromBottom: bottom,
+          eventSource: updateSource === window ? document.body : this.node
+        }));
+      });
+      this.framePending = true;
+    }
   }
 }
