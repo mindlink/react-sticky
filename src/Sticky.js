@@ -83,10 +83,6 @@ export default class Sticky extends Component {
       width: placeholderClientRect.width
     }
 
-    if (!this.props.disableHardwareAcceleration) {
-      style.transform = 'translateZ(0)';
-    }
-
     this.setState({
       isSticky,
       wasSticky,
